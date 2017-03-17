@@ -11,5 +11,8 @@
 * pypinyin库合成拼音
 * wxPython生成界面
 
+
+URL: <https://github.com/pengshulin/copybook_generator>
+
 Peng Shulin <trees_peng@163.com> 2017
 

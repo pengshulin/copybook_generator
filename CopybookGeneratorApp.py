@@ -187,7 +187,7 @@ def conv(cfg):
                     if copy_count == 1: 
                         color = 'black'
                     elif copy_count <= 4:
-                        color = 'grey'
+                        color = '#C0C0C0'
                     else:
                         c = None
                 lcolor = 'green'

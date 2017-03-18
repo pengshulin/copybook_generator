@@ -126,7 +126,7 @@ def conv(cfg):
 
         height_pinyin = height * 0.3
 
-        def draw_cell( x, y, w, h, grid_type='mi' ):
+        def draw_cell( x, y, w, h, grid_type='mi', color='black' ):
             x0, x1, x2, y0, y1, y2 = x, x+w/2, x+w, y, y+h/2, y+h
             l1=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x2*unit, y0*unit)))
             l2=lines.add(dwg.line(start=(x2*unit, y0*unit), end=(x2*unit, y2*unit)))
@@ -144,7 +144,7 @@ def conv(cfg):
                 l7.dasharray([2,2])
                 l8.dasharray([2,2])
 
-        def draw_cell_pinyin( x, y, w, h ):
+        def draw_cell_pinyin( x, y, w, h, color='black' ):
             x0, x1, y0, y1, y2, y3 = x, x+w, y, y+h/3, y+h*2/3, y+h
             l1=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x1*unit, y0*unit)))
             l2=lines.add(dwg.line(start=(x1*unit, y0*unit), end=(x1*unit, y3*unit)))
@@ -161,33 +161,47 @@ def conv(cfg):
             except:
                 return None
  
-        def draw_text( x, y, w, h, c ):
+        def draw_text( x, y, w, h, c, color='black' ):
             dwg.add( dwg.text(c, insert=((x+w/2)*unit,(y+h*0.86)*unit), 
                      text_anchor=u'middle', font_family=font,
-                     font_size=h*unit, fill='black' ) ) 
+                     font_size=h*unit, fill=color ) ) 
         
-        def draw_text_pinyin( x, y, w, h, c ):
+        def draw_text_pinyin( x, y, w, h, c, color='black' ):
             conv = pinyin(c)[0][0] 
             dwg.add( dwg.text(conv, insert=((x+w/2)*unit,(y+h*2/3)*unit),
                          text_anchor=u'middle', 
-                    font_family=u'FreeSans', font_size=h*2/3*unit, fill='black' ) ) 
+                    font_family=u'FreeSans', font_size=h*2/3*unit, fill=color ) ) 
         
         cursor_y = margin_top
         while cursor_y + height < margin_bottom:
             cursor_x = margin_left
-            while cursor_x + width < margin_right:
+            if cfg['copybook_mode']:
                 c = get_new_char()
+                copy_count = 0
+            while cursor_x + width < margin_right:
+                if not cfg['copybook_mode']:
+                    c = get_new_char()
+                    color = 'black'
+                else:
+                    copy_count += 1
+                    if copy_count == 1: 
+                        color = 'black'
+                    elif copy_count <= 4:
+                        color = 'grey'
+                    else:
+                        c = None
+                lcolor = 'green'
                 if use_pinyin:
-                    draw_cell_pinyin( cursor_x, cursor_y, width, height_pinyin )
-                    draw_cell( cursor_x, cursor_y+height_pinyin, width, height, grid_type )
+                    draw_cell_pinyin( cursor_x, cursor_y, width, height_pinyin, lcolor )
+                    draw_cell( cursor_x, cursor_y+height_pinyin, width, height, grid_type, lcolor )
                     if c is not None:
-                        draw_text( cursor_x, cursor_y+height_pinyin, width, height, c )
-                        draw_text_pinyin( cursor_x, cursor_y, width, height_pinyin, c )
+                        draw_text( cursor_x, cursor_y+height_pinyin, width, height, c, color )
+                        draw_text_pinyin( cursor_x, cursor_y, width, height_pinyin, c, color )
                         print c,
                 else:
-                    draw_cell( cursor_x, cursor_y, width, height, grid_type )
+                    draw_cell( cursor_x, cursor_y, width, height, grid_type, lcolor )
                     if c is not None:
-                        draw_text( cursor_x, cursor_y, width, height, c )
+                        draw_text( cursor_x, cursor_y, width, height, c, color )
                         print c,
                 cursor_x += width + space_x
             if use_pinyin:
@@ -320,6 +334,7 @@ class MainFrame(MyFrame):
             cfg['output'] = self.text_ctrl_input.GetValue()
             cfg['keep_tempfiles'] = self.checkbox_keep_tempfiles.GetValue()
             cfg['pages_limit'] = int(self.text_ctrl_pages_limit.GetValue())
+            cfg['copybook_mode'] = self.checkbox_copybook_mode.GetValue()
             if cfg['output']:
                 conv( cfg )
             else:

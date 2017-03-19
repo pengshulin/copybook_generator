@@ -64,19 +64,32 @@ MODE = [
 },
 
 {
-'name': '5寸手机 6*11',
-'page_width': 7, 'page_height': 13, 'margin_x': 0.1, 'margin_y': 0.3,
+'name': '5.5寸手机 6*10',
+'page_width': 6.7, 'page_height': 12.1, 'margin_x': 0.3, 'margin_y': 0.3,
+'width': 1.0, 'height': 1.0, 'space_x': 0.0, 'space_y': 0.0,
+'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+},
+
+{
+'name': '5.5寸手机 4*7',
+'page_width': 6.7, 'page_height': 12.1, 'margin_x': 0.3, 'margin_y': 0.1,
+'width': 1.5, 'height': 1.5, 'space_x': 0.0, 'space_y': 0.0,
+'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+},
+
+{
+'name': '6寸Kindle 8*10',
+'page_width': 9, 'page_height': 12, 'margin_x': 0.1, 'margin_y': 0.1,
 'width': 1.1, 'height': 1.1, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
 },
 
 {
-'name': '5寸手机 4*7',
-'page_width': 7, 'page_height': 13, 'margin_x': 0.3, 'margin_y': 0.1,
-'width': 1.6, 'height': 1.6, 'space_x': 0.0, 'space_y': 0.0,
+'name': '6寸Kindle 6*8',
+'page_width': 9, 'page_height': 12, 'margin_x': 0.2, 'margin_y': 0.1,
+'width': 1.4, 'height': 1.4, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
 },
-
 
 
 ]
@@ -117,7 +130,7 @@ def conv(cfg):
                 c = c.strip()
             if c:
                 contents.append(c)
-        print contents
+        #print contents
         return contents
  
     def draw_page( fname ):

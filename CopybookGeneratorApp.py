@@ -9,6 +9,8 @@ import math
 import time
 from CopybookGeneratorDlg import *
 import svgwrite
+import cairosvg
+import pdfrw
 from pypinyin import pinyin
 
    
@@ -210,19 +212,19 @@ def conv(cfg):
                     if c is not None:
                         draw_text( cursor_x, cursor_y+height_pinyin, width, height, c, color )
                         draw_text_pinyin( cursor_x, cursor_y, width, height_pinyin, c, color )
-                        print c,
+                        #print c,
                 else:
                     draw_cell( cursor_x, cursor_y, width, height, grid_type, lcolor )
                     if c is not None:
                         draw_text( cursor_x, cursor_y, width, height, c, color )
-                        print c,
+                        #print c,
                 cursor_x += width + space_x
             if use_pinyin:
                 cursor_y += height + height_pinyin + space_y
             else:
                 cursor_y += height + space_y
         dwg.save()
-        print ''
+        #print ''
 
     contents = read_source(source)
     page_index = 1
@@ -233,25 +235,25 @@ def conv(cfg):
         output_svg = os.path.join(outputdir, '%d.svg'% page_index )
         output_pdf = os.path.join(outputdir, '%d.pdf'% page_index )
         draw_page( output_svg )
-        cmd = u'inkscape --export-pdf=%s --export-text-to-path %s'% (output_pdf, output_svg)
-        print cmd
-        os.system( cmd.encode(encoding='utf8') )
+        cairosvg.svg2pdf(url=output_svg, write_to=output_pdf)
         svgs.append( output_svg )
         pdfs.append( output_pdf )
         page_index += 1
         if pages_limit and (page_index > pages_limit):
             break
-    
+    # join pages 
     output_joined_pdf = os.path.join(outputdir, prefixname+'.pdf')
-    cmd = u'pdfjoin -o %s -q -- %s'% (output_joined_pdf, ' '.join(pdfs))
-    print cmd
-    os.system( cmd.encode(encoding='utf8') )
-
+    writer = pdfrw.PdfWriter()
+    for f in pdfs:
+        writer.addpages(pdfrw.PdfReader(f).pages)
+    writer.write( output_joined_pdf )
     # remove 
     if not cfg['keep_tempfiles']:
-        cmd = u'rm %s'% (' '.join(svgs + pdfs))
-        print cmd
-        os.system( cmd.encode(encoding='utf8') )
+        #cmd = u'rm %s'% (' '.join(svgs + pdfs))
+        #print cmd
+        #os.system( cmd.encode(encoding='utf8') )
+        for f in svgs + pdfs:
+            os.remove(f)
 
 
 
@@ -352,8 +354,8 @@ class MainFrame(MyFrame):
                 conv( cfg )
             else:
                 self.info( '请选择输入文件' )
-        except:
-            self.info( '配置错误', wx.ICON_ERROR )
+        except Exception as e:
+            self.info( u'错误 %s'% unicode(e), wx.ICON_ERROR )
             
 
 

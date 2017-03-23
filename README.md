@@ -6,8 +6,8 @@
 
 * linux
 * svgwrite库生成svg模板
-* inkscape转换成单页pdf
-* pdfjoin合成整体pdf
+* cairosvg转换成单页pdf
+* pdfrw合成整体pdf
 * pypinyin库合成拼音
 * wxPython生成界面
 

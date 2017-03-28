@@ -28,6 +28,7 @@ MODE = [
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.0, 'margin_y': 1.0,
 'width': 0.67, 'height': 0.67, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '田字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 {
@@ -35,6 +36,7 @@ MODE = [
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.0, 'margin_y': 1.0,
 'width': 0.79, 'height': 0.79, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '田字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 {
@@ -42,6 +44,7 @@ MODE = [
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.5, 'margin_y': 1.5,
 'width': 1.47, 'height': 1.47, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 {
@@ -49,6 +52,7 @@ MODE = [
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.5, 'margin_y': 1.5,
 'width': 2.0, 'height': 2.0, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 {
@@ -56,6 +60,7 @@ MODE = [
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.5, 'margin_y': 1.5,
 'width': 2.9, 'height': 2.9, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 {
@@ -63,6 +68,7 @@ MODE = [
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.5, 'margin_y': 1.5,
 'width': 4.4, 'height': 4.4, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 {
@@ -70,6 +76,7 @@ MODE = [
 'page_width': 6.7, 'page_height': 12.1, 'margin_x': 0.3, 'margin_y': 0.3,
 'width': 1.0, 'height': 1.0, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 {
@@ -77,6 +84,7 @@ MODE = [
 'page_width': 6.7, 'page_height': 12.1, 'margin_x': 0.3, 'margin_y': 0.1,
 'width': 1.5, 'height': 1.5, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 {
@@ -84,6 +92,7 @@ MODE = [
 'page_width': 9, 'page_height': 12, 'margin_x': 0.1, 'margin_y': 0.1,
 'width': 1.1, 'height': 1.1, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 {
@@ -91,6 +100,7 @@ MODE = [
 'page_width': 9, 'page_height': 12, 'margin_x': 0.2, 'margin_y': 0.1,
 'width': 1.4, 'height': 1.4, 'space_x': 0.0, 'space_y': 0.0,
 'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
+'layout_type': '字帖',
 },
 
 
@@ -123,7 +133,7 @@ def conv(cfg):
     grid_type = cfg['grid_type']
     font = cfg['font']
 
-    def read_source(fname):
+    def read_source(fname, cfg):
         contents = []
         for c in open(fname, 'r').read().decode(encoding='utf8', errors='strict'):
             if c == u'_':
@@ -132,6 +142,8 @@ def conv(cfg):
                 c = c.strip()
             if c:
                 contents.append(c)
+            elif cfg['layout_type'] == '抄写词语':
+                contents.append("EOL")
         #print contents
         return contents
  
@@ -190,21 +202,35 @@ def conv(cfg):
         cursor_y = margin_top
         while cursor_y + height < margin_bottom:
             cursor_x = margin_left
-            if cfg['copybook_mode']:
+            inline_counter = 0
+            if cfg['layout_type'] == '抄写单字':
                 c = get_new_char()
-                copy_count = 0
+            elif cfg['layout_type'] == '抄写词语':
+                cs = []
+                while True:
+                    nc = get_new_char()
+                    if nc is None or nc == 'EOL':
+                        break
+                    else:
+                        cs.append( nc )
             while cursor_x + width < margin_right:
-                if not cfg['copybook_mode']:
-                    c = get_new_char()
-                    color = 'black'
-                else:
-                    copy_count += 1
-                    if copy_count == 1: 
+                inline_counter += 1
+                if cfg['layout_type'] == '抄写单字':
+                    if inline_counter == 1: 
                         color = 'black'
-                    elif copy_count <= 4:
+                    elif inline_counter <= 4:
                         color = '#C0C0C0'
                     else:
                         c = None
+                elif cfg['layout_type'] == '抄写词语':
+                    try:
+                        c = cs[inline_counter-1]
+                    except IndexError:
+                        c = u'　'
+                    color = 'black'
+                else:
+                    c = get_new_char()
+                    color = 'black'
                 lcolor = 'green'
                 if use_pinyin:
                     draw_cell_pinyin( cursor_x, cursor_y, width, height_pinyin, lcolor )
@@ -226,7 +252,7 @@ def conv(cfg):
         dwg.save()
         #print ''
 
-    contents = read_source(source)
+    contents = read_source(source, cfg)
     page_index = 1
     if not os.path.isdir(outputdir):
         os.mkdir(outputdir)
@@ -265,6 +291,7 @@ class MainFrame(MyFrame):
         self.combo_box_mode.AppendItems( [i['name'] for i in MODE] )
         self.combo_box_font.AppendItems( ['楷体', '隶书'] )
         self.combo_box_grid_type.AppendItems( ['米字格', '田字格', '口字格'] )
+        self.combo_box_layout_type.AppendItems( ['字帖', '抄写单字', '抄写词语'] )
         self.combo_box_mode.SetValue('A4 12*18')
         self.doSelectMode()
 
@@ -329,6 +356,7 @@ class MainFrame(MyFrame):
             self.combo_box_font.SetValue( m['font'] )
             self.combo_box_grid_type.SetValue( m['grid_type'] )
             self.checkbox_pinyin.SetValue( m['pinyin'] )
+            self.combo_box_layout_type.SetValue( m['layout_type'] )
 
     def OnGenerate(self, event):
         self.info( '' )
@@ -349,7 +377,7 @@ class MainFrame(MyFrame):
             cfg['output'] = self.text_ctrl_input.GetValue()
             cfg['keep_tempfiles'] = self.checkbox_keep_tempfiles.GetValue()
             cfg['pages_limit'] = int(self.text_ctrl_pages_limit.GetValue())
-            cfg['copybook_mode'] = self.checkbox_copybook_mode.GetValue()
+            cfg['layout_type'] = self.combo_box_layout_type.GetValue()
             if cfg['output']:
                 conv( cfg )
             else:

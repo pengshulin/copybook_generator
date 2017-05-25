@@ -106,6 +106,12 @@ MODE = [
 
 ]
 
+                        
+COLOR_REPEAT = []
+for i in range(10):
+    v = int(255*(1-1.0/float(i+1.0)))
+    COLOR_REPEAT.append( '#%02X%02X%02X'% (v,v,v) )
+#print COLOR_REPEAT
 
 
 def conv(cfg):
@@ -132,6 +138,7 @@ def conv(cfg):
     use_pinyin = cfg['pinyin']
     grid_type = cfg['grid_type']
     font = cfg['font']
+    font_scale = 1.0
 
     def read_source(fname, cfg):
         contents = []
@@ -143,8 +150,9 @@ def conv(cfg):
             if c:
                 contents.append(c)
             elif cfg['layout_type'] == '抄写词语':
-                contents.append("EOL")
-        #print contents
+                if contents and contents[-1] != 'EOL':
+                    contents.append("EOL")
+        print contents
         return contents
  
     def draw_page( fname ):
@@ -154,6 +162,7 @@ def conv(cfg):
         height_pinyin = height * 0.3
 
         def draw_cell( x, y, w, h, grid_type='mi', color='black' ):
+            # TODO: set line color
             x0, x1, x2, y0, y1, y2 = x, x+w/2, x+w, y, y+h/2, y+h
             l1=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x2*unit, y0*unit)))
             l2=lines.add(dwg.line(start=(x2*unit, y0*unit), end=(x2*unit, y2*unit)))
@@ -172,6 +181,7 @@ def conv(cfg):
                 l8.dasharray([2,2])
 
         def draw_cell_pinyin( x, y, w, h, color='black' ):
+            # TODO: set line color
             x0, x1, y0, y1, y2, y3 = x, x+w, y, y+h/3, y+h*2/3, y+h
             l1=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x1*unit, y0*unit)))
             l2=lines.add(dwg.line(start=(x1*unit, y0*unit), end=(x1*unit, y3*unit)))
@@ -189,9 +199,9 @@ def conv(cfg):
                 return None
  
         def draw_text( x, y, w, h, c, color='black' ):
-            dwg.add( dwg.text(c, insert=((x+w/2)*unit,(y+h*0.86)*unit), 
+            dwg.add( dwg.text(c, insert=((x+w/2)*unit,(y+h*font_scale*0.86)*unit), 
                      text_anchor=u'middle', font_family=font,
-                     font_size=h*unit, fill=color ) ) 
+                     font_size=(h*font_scale)*unit, fill=color ) ) 
         
         def draw_text_pinyin( x, y, w, h, c, color='black' ):
             conv = pinyin(c)[0][0] 
@@ -202,7 +212,7 @@ def conv(cfg):
         cursor_y = margin_top
         while cursor_y + height < margin_bottom:
             cursor_x = margin_left
-            inline_counter = 0
+            repeat_counter = 1 
             if cfg['layout_type'] == '抄写单字':
                 c = get_new_char()
             elif cfg['layout_type'] == '抄写词语':
@@ -213,25 +223,34 @@ def conv(cfg):
                         break
                     else:
                         cs.append( nc )
+                print cs
+                in_word_counter = 1
             while cursor_x + width < margin_right:
-                inline_counter += 1
                 if cfg['layout_type'] == '抄写单字':
-                    if inline_counter == 1: 
-                        color = 'black'
-                    elif inline_counter <= 4:
-                        color = '#C0C0C0'
+                    if repeat_counter <= 4:
+                        color = COLOR_REPEAT[repeat_counter-1]
                     else:
                         c = None
+                    repeat_counter += 1
                 elif cfg['layout_type'] == '抄写词语':
-                    try:
-                        c = cs[inline_counter-1]
-                    except IndexError:
-                        c = u'　'
-                    color = 'black'
+                    if repeat_counter <= 2:
+                        try:
+                            c = cs[in_word_counter-1]
+                        except IndexError:
+                            c = u'　'
+                        color = COLOR_REPEAT[repeat_counter-1]
+                    else:
+                        c = None
+                    if in_word_counter >= len(cs):
+                        repeat_counter += 1
+                        in_word_counter = 1
+                    else:
+                        in_word_counter += 1
                 else:
                     c = get_new_char()
                     color = 'black'
-                lcolor = 'green'
+                #print c
+                lcolor = 'green'  # not used now
                 if use_pinyin:
                     draw_cell_pinyin( cursor_x, cursor_y, width, height_pinyin, lcolor )
                     draw_cell( cursor_x, cursor_y+height_pinyin, width, height, grid_type, lcolor )
@@ -243,7 +262,6 @@ def conv(cfg):
                     draw_cell( cursor_x, cursor_y, width, height, grid_type, lcolor )
                     if c is not None:
                         draw_text( cursor_x, cursor_y, width, height, c, color )
-                        #print c,
                 cursor_x += width + space_x
             if use_pinyin:
                 cursor_y += height + height_pinyin + space_y

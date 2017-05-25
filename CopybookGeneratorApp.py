@@ -138,7 +138,8 @@ def conv(cfg):
     use_pinyin = cfg['pinyin']
     grid_type = cfg['grid_type']
     font = cfg['font']
-    font_scale = 0.9
+    font_scale = cfg['font_scale']
+    font_base = cfg['font_base']
 
     def read_source(fname, cfg):
         contents = []
@@ -152,7 +153,7 @@ def conv(cfg):
             elif cfg['layout_type'] == '抄写词语':
                 if contents and contents[-1] != 'EOL':
                     contents.append("EOL")
-        print contents
+        #print contents
         return contents
  
     def draw_page( fname ):
@@ -199,7 +200,7 @@ def conv(cfg):
                 return None
  
         def draw_text( x, y, w, h, c, color='black' ):
-            dwg.add( dwg.text(c, insert=((x+w/2)*unit,(y+h*((1+font_scale)/2-0.14))*unit), 
+            dwg.add( dwg.text(c, insert=((x+w/2)*unit,(y+h*((1+font_scale)/2-font_base))*unit), 
                      text_anchor=u'middle', font_family=font,
                      font_size=(h*font_scale)*unit, fill=color ) ) 
         
@@ -223,7 +224,7 @@ def conv(cfg):
                         break
                     else:
                         cs.append( nc )
-                print cs
+                #print cs
                 in_word_counter = 1
             while cursor_x + width < margin_right:
                 if cfg['layout_type'] == '抄写单字':
@@ -396,6 +397,8 @@ class MainFrame(MyFrame):
             cfg['keep_tempfiles'] = self.checkbox_keep_tempfiles.GetValue()
             cfg['pages_limit'] = int(self.text_ctrl_pages_limit.GetValue())
             cfg['layout_type'] = self.combo_box_layout_type.GetValue()
+            cfg['font_scale'] = float(self.text_ctrl_font_scale.GetValue())
+            cfg['font_base'] = float(self.text_ctrl_font_base.GetValue())
             if cfg['output']:
                 conv( cfg )
             else:

@@ -138,7 +138,7 @@ def conv(cfg):
     use_pinyin = cfg['pinyin']
     grid_type = cfg['grid_type']
     font = cfg['font']
-    font_scale = 1.0
+    font_scale = 0.9
 
     def read_source(fname, cfg):
         contents = []
@@ -199,7 +199,7 @@ def conv(cfg):
                 return None
  
         def draw_text( x, y, w, h, c, color='black' ):
-            dwg.add( dwg.text(c, insert=((x+w/2)*unit,(y+h*font_scale*0.86)*unit), 
+            dwg.add( dwg.text(c, insert=((x+w/2)*unit,(y+h*((1+font_scale)/2-0.14))*unit), 
                      text_anchor=u'middle', font_family=font,
                      font_size=(h*font_scale)*unit, fill=color ) ) 
         
@@ -227,7 +227,7 @@ def conv(cfg):
                 in_word_counter = 1
             while cursor_x + width < margin_right:
                 if cfg['layout_type'] == '抄写单字':
-                    if repeat_counter <= 4:
+                    if repeat_counter <= 3:
                         color = COLOR_REPEAT[repeat_counter-1]
                     else:
                         c = None

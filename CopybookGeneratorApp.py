@@ -107,9 +107,9 @@ MODE = [
 ]
 
                         
-COLOR_REPEAT = []
+COLOR_REPEAT = ['black']
 for i in range(10):
-    v = int(255*(1-1.0/float(i+1.0)))
+    v = int(255*(1-0.3/float(i+2.0)))
     COLOR_REPEAT.append( '#%02X%02X%02X'% (v,v,v) )
 #print COLOR_REPEAT
 

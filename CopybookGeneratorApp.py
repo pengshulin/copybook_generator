@@ -140,6 +140,14 @@ def conv(cfg):
     font = cfg['font']
     font_scale = cfg['font_scale']
     font_base = cfg['font_base']
+    font_family_page = 'Sans'
+    font_size_page = 0.3
+    font_family_foot_notes = '楷体'
+    font_size_foot_notes = 0.3
+    output_page_num = cfg['output_page_num']
+    output_foot_notes = cfg['output_foot_notes']
+    foot_notes = cfg['foot_notes']
+    foot_notes_position = cfg['foot_notes_position']
 
     def read_source(fname, cfg):
         contents = []
@@ -156,7 +164,7 @@ def conv(cfg):
         #print contents
         return contents
  
-    def draw_page( fname ):
+    def draw_page( fname, page_num ):
         dwg = svgwrite.Drawing(fname, (paper_w*unit, paper_h*unit), debug=True)
         lines = dwg.add(dwg.g(stroke='grey'))
 
@@ -209,7 +217,40 @@ def conv(cfg):
             dwg.add( dwg.text(conv, insert=((x+w/2)*unit,(y+h*2/3)*unit),
                          text_anchor=u'middle', 
                     font_family=u'FreeSans', font_size=h*2/3*unit, fill=color ) ) 
-        
+       
+        def draw_page_num(num):
+            dwg.add( dwg.text('%d'%num, insert=((paper_w/2)*unit,(margin_bottom+font_size_page)*unit), 
+                     text_anchor=u'middle', font_family=font_family_page,
+                     font_size=(font_size_page)*unit, fill='black') ) 
+       
+        def draw_foot_notes():
+            if foot_notes_position == '左上':
+                posx = margin_left
+                posy = margin_top - font_size_foot_notes * 0.3
+                anchor = 'start'
+            elif foot_notes_position == '右上':
+                posx = margin_right
+                posy = margin_top - font_size_foot_notes * 0.3
+                anchor = 'end'
+            elif foot_notes_position == '左下':
+                posx = margin_left
+                posy = margin_bottom + font_size_foot_notes
+                anchor = 'start'
+            elif foot_notes_position == '右下':
+                posx = margin_right
+                posy = margin_bottom + font_size_foot_notes
+                anchor = 'end'
+            else:
+                return
+            dwg.add( dwg.text(foot_notes, insert=(posx*unit,posy*unit), 
+                     text_anchor=anchor, font_family=font_family_foot_notes,
+                     font_size=(font_size_foot_notes)*unit, fill='black') ) 
+
+        if output_page_num:
+            draw_page_num( page_num )
+        if output_foot_notes and foot_notes:
+            draw_foot_notes()
+             
         cursor_y = margin_top
         while cursor_y + height < margin_bottom:
             cursor_x = margin_left
@@ -279,7 +320,7 @@ def conv(cfg):
     while contents:
         output_svg = os.path.join(outputdir, '%d.svg'% page_index )
         output_pdf = os.path.join(outputdir, '%d.pdf'% page_index )
-        draw_page( output_svg )
+        draw_page( output_svg, page_index )
         cairosvg.svg2pdf(url=output_svg, write_to=output_pdf)
         svgs.append( output_svg )
         pdfs.append( output_pdf )
@@ -312,7 +353,9 @@ class MainFrame(MyFrame):
         self.combo_box_grid_type.AppendItems( ['米字格', '田字格', '口字格'] )
         self.combo_box_layout_type.AppendItems( ['字帖', '抄写单字', '抄写词语'] )
         self.combo_box_mode.SetValue('A4 12*18')
+        self.text_ctrl_foot_notes.SetValue('加油！')
         self.doSelectMode()
+
 
     def OnClose(self, event):
         self.Destroy()
@@ -399,6 +442,10 @@ class MainFrame(MyFrame):
             cfg['layout_type'] = self.combo_box_layout_type.GetValue()
             cfg['font_scale'] = float(self.text_ctrl_font_scale.GetValue())
             cfg['font_base'] = float(self.text_ctrl_font_base.GetValue())
+            cfg['output_page_num'] = self.checkbox_output_page_num.GetValue()
+            cfg['output_foot_notes'] = self.checkbox_output_foot_notes.GetValue()
+            cfg['foot_notes'] = self.text_ctrl_foot_notes.GetValue()
+            cfg['foot_notes_position'] = self.combo_box_foot_notes_position.GetValue()
             if cfg['output']:
                 conv( cfg )
             else:

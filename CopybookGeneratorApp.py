@@ -27,80 +27,60 @@ MODE = [
 'name': 'A4 28*41',
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.0, 'margin_y': 1.0,
 'width': 0.67, 'height': 0.67, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '田字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 {
 'name': 'A4 24*35',
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.0, 'margin_y': 1.0,
 'width': 0.79, 'height': 0.79, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '田字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 {
 'name': 'A4 12*18',  # default
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.5, 'margin_y': 1.5,
 'width': 1.47, 'height': 1.47, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 {
 'name': 'A4 8*13',
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.5, 'margin_y': 1.5,
 'width': 2.0, 'height': 2.0, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 {
 'name': 'A4 6*9',
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.5, 'margin_y': 1.5,
 'width': 2.9, 'height': 2.9, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 {
 'name': 'A4 4*6',
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.5, 'margin_y': 1.5,
 'width': 4.4, 'height': 4.4, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 {
 'name': '5.5寸手机 6*10',
 'page_width': 6.7, 'page_height': 12.1, 'margin_x': 0.3, 'margin_y': 0.3,
 'width': 1.0, 'height': 1.0, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 {
 'name': '5.5寸手机 4*7',
 'page_width': 6.7, 'page_height': 12.1, 'margin_x': 0.3, 'margin_y': 0.1,
 'width': 1.5, 'height': 1.5, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 {
 'name': '6寸Kindle 8*10',
 'page_width': 9, 'page_height': 12, 'margin_x': 0.1, 'margin_y': 0.1,
 'width': 1.1, 'height': 1.1, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 {
 'name': '6寸Kindle 6*8',
 'page_width': 9, 'page_height': 12, 'margin_x': 0.2, 'margin_y': 0.1,
 'width': 1.4, 'height': 1.4, 'space_x': 0.0, 'space_y': 0.0,
-'grid_type': '米字格',  'pinyin': False,  'font': '楷体',
-'layout_type': '字帖',
 },
 
 
@@ -225,19 +205,19 @@ def conv(cfg):
                      font_size=(font_size_page)*unit, fill='black') ) 
        
         def draw_foot_notes():
-            if foot_notes_position == '左上':
+            if foot_notes_position == '左上角':
                 posx = margin_left
                 posy = margin_top - font_size_foot_notes * 0.3
                 anchor = 'start'
-            elif foot_notes_position == '右上':
+            elif foot_notes_position == '右上角':
                 posx = margin_right
                 posy = margin_top - font_size_foot_notes * 0.3
                 anchor = 'end'
-            elif foot_notes_position == '左下':
+            elif foot_notes_position == '左下角':
                 posx = margin_left
                 posy = margin_bottom + font_size_foot_notes
                 anchor = 'start'
-            elif foot_notes_position == '右下':
+            elif foot_notes_position == '右下角':
                 posx = margin_right
                 posy = margin_bottom + font_size_foot_notes
                 anchor = 'end'
@@ -354,6 +334,12 @@ class MainFrame(MyFrame):
         self.combo_box_grid_type.AppendItems( ['米字格', '田字格', '口字格'] )
         self.combo_box_layout_type.AppendItems( ['字帖', '抄写单字', '抄写词语'] )
         self.combo_box_mode.SetValue('A4 12*18')
+        self.combo_box_font.SetValue( '楷体' )
+        self.combo_box_grid_type.SetValue( '田字格' )
+        self.checkbox_pinyin.SetValue( False )
+        self.combo_box_layout_type.SetValue( '字帖' )
+        self.combo_box_foot_notes_position.AppendItems( ['左上角','右上角','左下角','右下角'] )
+        self.combo_box_foot_notes_position.SetValue( '右下角' )
         self.text_ctrl_foot_notes.SetValue('勿忘初心 方得始终')
         self.doSelectMode()
 
@@ -416,10 +402,6 @@ class MainFrame(MyFrame):
             self.text_ctrl_height.SetValue( str(m['height']) )
             self.text_ctrl_space_x.SetValue( str(m['space_x']) )
             self.text_ctrl_space_y.SetValue( str(m['space_y']) )
-            self.combo_box_font.SetValue( m['font'] )
-            self.combo_box_grid_type.SetValue( m['grid_type'] )
-            self.checkbox_pinyin.SetValue( m['pinyin'] )
-            self.combo_box_layout_type.SetValue( m['layout_type'] )
 
     def OnGenerate(self, event):
         self.info( '' )

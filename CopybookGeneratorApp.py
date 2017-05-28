@@ -108,7 +108,7 @@ MODE = [
 
                         
 COLOR_REPEAT = ['black']
-for i in range(10):
+for i in range(50):
     v = int(255*(1-0.3/float(i+2.0)))
     COLOR_REPEAT.append( '#%02X%02X%02X'% (v,v,v) )
 #print COLOR_REPEAT
@@ -148,6 +148,7 @@ def conv(cfg):
     output_foot_notes = cfg['output_foot_notes']
     foot_notes = cfg['foot_notes']
     foot_notes_position = cfg['foot_notes_position']
+    repeat_times = cfg['repeat_times']
 
     def read_source(fname, cfg):
         contents = []
@@ -269,13 +270,13 @@ def conv(cfg):
                 in_word_counter = 1
             while cursor_x + width < margin_right:
                 if cfg['layout_type'] == '抄写单字':
-                    if repeat_counter <= 3:
+                    if repeat_counter <= repeat_times+1:
                         color = COLOR_REPEAT[repeat_counter-1]
                     else:
                         c = None
                     repeat_counter += 1
                 elif cfg['layout_type'] == '抄写词语':
-                    if repeat_counter <= 2:
+                    if repeat_counter <= repeat_times+1:
                         try:
                             c = cs[in_word_counter-1]
                         except IndexError:
@@ -353,7 +354,7 @@ class MainFrame(MyFrame):
         self.combo_box_grid_type.AppendItems( ['米字格', '田字格', '口字格'] )
         self.combo_box_layout_type.AppendItems( ['字帖', '抄写单字', '抄写词语'] )
         self.combo_box_mode.SetValue('A4 12*18')
-        self.text_ctrl_foot_notes.SetValue('加油！')
+        self.text_ctrl_foot_notes.SetValue('勿忘初心 方得始终')
         self.doSelectMode()
 
 
@@ -446,6 +447,7 @@ class MainFrame(MyFrame):
             cfg['output_foot_notes'] = self.checkbox_output_foot_notes.GetValue()
             cfg['foot_notes'] = self.text_ctrl_foot_notes.GetValue()
             cfg['foot_notes_position'] = self.combo_box_foot_notes_position.GetValue()
+            cfg['repeat_times'] = int(self.text_ctrl_repeat_times.GetValue())
             if cfg['output']:
                 conv( cfg )
             else:

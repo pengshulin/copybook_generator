@@ -437,7 +437,7 @@ class MainFrame(MyFrame):
         except Exception as e:
             self.info( u'错误 %s'% unicode(e), wx.ICON_ERROR )
             
-
+                
 
 
 if __name__ == "__main__":

@@ -11,11 +11,6 @@
 * pypinyin库合成拼音
 * wxPython生成界面
 
-Windows移植
------------
-cariosvg库运行不顺利，暂时无法在Windows下使用，
-若有谁能解决这个问题，麻烦告诉我一声。
-
 
 URL: <https://github.com/pengshulin/copybook_generator>
 

@@ -132,8 +132,16 @@ def conv(cfg):
 
     def read_source(fname, cfg):
         contents = []
-        for c in open(fname, 'r').read().decode(encoding='utf8', errors='strict'):
-            if c == u'_':
+        raw = open(fname, 'r').read().decode(encoding='utf8', errors='strict')
+        raw2 = []
+        for l in raw.split('EOL'):
+            raw2 += list(l)
+            raw2.append('EOL')
+        for c in raw:
+        #for c in raw2:
+            if c == u'\ufeff':
+                continue
+            elif c == u'_':
                 c = u'　'
             else:
                 c = c.strip()
@@ -142,7 +150,7 @@ def conv(cfg):
             elif cfg['layout_type'] == '抄写词语':
                 if contents and contents[-1] != 'EOL':
                     contents.append("EOL")
-        #print contents
+        print contents
         return contents
  
     def draw_page( fname, page_num ):
@@ -194,10 +202,12 @@ def conv(cfg):
                      font_size=(h*font_scale)*unit, fill=color ) ) 
         
         def draw_text_pinyin( x, y, w, h, c, color='black' ):
-            conv = pinyin(c)[0][0] 
+            conv = pinyin(c)[0][0]
+            if conv == c:
+                return
             dwg.add( dwg.text(conv, insert=((x+w/2)*unit,(y+h*2/3)*unit),
                          text_anchor=u'middle', 
-                    font_family=u'FreeSans', font_size=h*2/3*unit, fill=color ) ) 
+                    font_family=u'Sans', font_size=h*2/3*unit, fill=color ) ) 
        
         def draw_page_num(num):
             dwg.add( dwg.text('%d'%num, insert=((paper_w/2)*unit,(margin_bottom+font_size_page)*unit), 

@@ -340,7 +340,7 @@ class MainFrame(MyFrame):
         MyFrame.__init__( self, *args, **kwds )
         self.Bind(wx.EVT_CLOSE, self.OnClose, self)
         self.combo_box_mode.AppendItems( [i['name'] for i in MODE] )
-        self.combo_box_font.AppendItems( ['楷体', '隶书'] )
+        #self.combo_box_font.AppendItems( ['楷体', '隶书'] )
         self.combo_box_grid_type.AppendItems( ['米字格', '田字格', '口字格'] )
         self.combo_box_layout_type.AppendItems( ['字帖', '抄写单字', '抄写词语'] )
         self.combo_box_mode.SetValue('A4 12*18')
@@ -353,6 +353,9 @@ class MainFrame(MyFrame):
         self.text_ctrl_foot_notes.SetValue('勿忘初心 方得始终')
         self.doSelectMode()
 
+        e = wx.FontEnumerator()
+        e.EnumerateFacenames()
+        self.combo_box_font.AppendItems( e.GetFacenames() )
 
     def OnClose(self, event):
         self.Destroy()

@@ -16,7 +16,7 @@ from pypinyin import pinyin
    
 
 ABOUT_INFO = '''\
-字帖生成器 V1.0
+字帖生成器 V1.1
 
 URL: https://github.com/pengshulin/copybook_generator
 Peng Shullin <trees_peng@163.com> 2017
@@ -162,16 +162,23 @@ def conv(cfg):
         def draw_cell( x, y, w, h, grid_type='mi', color='black' ):
             # TODO: set line color
             x0, x1, x2, y0, y1, y2 = x, x+w/2, x+w, y, y+h/2, y+h
+            # horizontal lines
             l1=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x2*unit, y0*unit)))
-            l2=lines.add(dwg.line(start=(x2*unit, y0*unit), end=(x2*unit, y2*unit)))
-            l3=lines.add(dwg.line(start=(x0*unit, y2*unit), end=(x2*unit, y2*unit)))
-            l4=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x0*unit, y2*unit)))
-
+            l2=lines.add(dwg.line(start=(x0*unit, y2*unit), end=(x2*unit, y2*unit)))
+            # vertical lines
+            if not grid_type == '上下横线':
+                l3=lines.add(dwg.line(start=(x2*unit, y0*unit), end=(x2*unit, y2*unit)))
+                l4=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x0*unit, y2*unit)))
+                if grid_type == '上下横线（带分割线）':
+                    l3.dasharray([2,2])
+                    l4.dasharray([2,2])
+            # center vertical/horizontal lines
             if grid_type in ['米字格', '田字格']:
                 l5=lines.add(dwg.line(start=(x0*unit, y1*unit), end=(x2*unit, y1*unit)))
                 l6=lines.add(dwg.line(start=(x1*unit, y0*unit), end=(x1*unit, y2*unit)))
                 l5.dasharray([2,2])
                 l6.dasharray([2,2])
+            # cross lines
             if grid_type == '米字格':
                 l7=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x2*unit, y2*unit)))
                 l8=lines.add(dwg.line(start=(x0*unit, y2*unit), end=(x2*unit, y0*unit)))
@@ -181,15 +188,23 @@ def conv(cfg):
         def draw_cell_pinyin( x, y, w, h, color='black' ):
             # TODO: set line color
             x0, x1, y0, y1, y2, y3 = x, x+w, y, y+h/3, y+h*2/3, y+h
+            # top/bottom horizontal
             l1=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x1*unit, y0*unit)))
-            l2=lines.add(dwg.line(start=(x1*unit, y0*unit), end=(x1*unit, y3*unit)))
-            l3=lines.add(dwg.line(start=(x0*unit, y3*unit), end=(x1*unit, y3*unit)))
-            l4=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x0*unit, y3*unit)))
-            l5=lines.add(dwg.line(start=(x0*unit, y1*unit), end=(x1*unit, y1*unit)))
-            l6=lines.add(dwg.line(start=(x0*unit, y2*unit), end=(x1*unit, y2*unit)))
-            l5.dasharray([2,2])
-            l6.dasharray([2,2])
- 
+            l2=lines.add(dwg.line(start=(x0*unit, y3*unit), end=(x1*unit, y3*unit)))
+            # middle horizontal
+            l3=lines.add(dwg.line(start=(x0*unit, y1*unit), end=(x1*unit, y1*unit)))
+            l4=lines.add(dwg.line(start=(x0*unit, y2*unit), end=(x1*unit, y2*unit)))
+            l3.dasharray([2,2])
+            l4.dasharray([2,2])
+            # left/right vertical
+            if not grid_type == '上下横线':
+                l5=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x0*unit, y3*unit)))
+                l6=lines.add(dwg.line(start=(x1*unit, y0*unit), end=(x1*unit, y3*unit)))
+                if grid_type == '上下横线（带分割线）':
+                    l5.dasharray([2,2])
+                    l6.dasharray([2,2])
+
+
         def get_new_char():
             try:
                 return contents.pop(0)
@@ -341,12 +356,14 @@ class MainFrame(MyFrame):
         self.Bind(wx.EVT_CLOSE, self.OnClose, self)
         self.combo_box_mode.AppendItems( [i['name'] for i in MODE] )
         #self.combo_box_font.AppendItems( ['楷体', '隶书'] )
-        self.combo_box_grid_type.AppendItems( ['米字格', '田字格', '口字格'] )
+        self.combo_box_grid_type.AppendItems( ['米字格', '田字格', '口字格', '上下横线', 
+                                               '上下横线（带分割线）'] )
         self.combo_box_layout_type.AppendItems( ['字帖', '抄写单字', '抄写词语'] )
         self.combo_box_mode.SetValue('A4 12*18')
         self.combo_box_font.SetValue( '楷体' )
         self.combo_box_grid_type.SetValue( '田字格' )
         self.checkbox_pinyin.SetValue( False )
+        self.text_ctrl_font_scale.SetValue( '0.8' )
         self.combo_box_layout_type.SetValue( '字帖' )
         self.combo_box_foot_notes_position.AppendItems( ['左上角','右上角','左下角','右下角'] )
         self.combo_box_foot_notes_position.SetValue( '右下角' )
@@ -355,7 +372,15 @@ class MainFrame(MyFrame):
 
         e = wx.FontEnumerator()
         e.EnumerateFacenames()
-        self.combo_box_font.AppendItems( e.GetFacenames() )
+        filtered_fonts = []
+        for f in e.GetFacenames():
+            try:
+                str(f)  # 过滤掉ASCII名称的英文字体
+                continue
+            except:
+                pass
+            filtered_fonts.append( f )
+        self.combo_box_font.AppendItems( filtered_fonts )
 
     def OnClose(self, event):
         self.Destroy()

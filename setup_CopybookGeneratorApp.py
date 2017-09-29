@@ -4,7 +4,7 @@ import py2exe
 
 setup(
     name=u'Copybook Generator',
-    version='1.0',
+    version='1.1',
     description='automatically generate copybooks',
     author='Peng Shulin',
     windows = [

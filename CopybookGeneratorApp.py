@@ -378,6 +378,8 @@ class MainFrame(MyFrame):
                 str(f)  # 过滤掉ASCII名称的英文字体
                 continue
             except:
+                if f.startswith('@'):
+                    continue  # 过滤掉@开头的字体（Windows下的旋转字体）
                 pass
             filtered_fonts.append( f )
         self.combo_box_font.AppendItems( filtered_fonts )

@@ -24,6 +24,12 @@ Peng Shullin <trees_peng@163.com> 2017
 
 MODE = [
 {
+'name': 'A4 抄写本（行高1.0，间距0.2）',
+'page_width': 21.0, 'page_height': 29.7, 'margin_x': 0.9, 'margin_y': 1.0,
+'width': 1.0, 'height': 1.0, 'space_x': 0.0, 'space_y': 0.2,
+},
+
+{
 'name': 'A4 28*41',
 'page_width': 21.0, 'page_height': 29.7, 'margin_x': 1.0, 'margin_y': 1.0,
 'width': 0.67, 'height': 0.67, 'space_x': 0.0, 'space_y': 0.0,
@@ -155,12 +161,12 @@ def conv(cfg):
  
     def draw_page( fname, page_num ):
         dwg = svgwrite.Drawing(fname, (paper_w*unit, paper_h*unit), debug=True)
-        lines = dwg.add(dwg.g(stroke='grey'))
 
         height_pinyin = height * 0.3
 
-        def draw_cell( x, y, w, h, grid_type='mi', color='black' ):
-            # TODO: set line color
+        def draw_cell( x, y, w, h, grid_type='mi', color='grey' ):
+            # append group of lines
+            lines = dwg.add(dwg.g(stroke=color))
             x0, x1, x2, y0, y1, y2 = x, x+w/2, x+w, y, y+h/2, y+h
             # horizontal lines
             l1=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x2*unit, y0*unit)))
@@ -185,8 +191,9 @@ def conv(cfg):
                 l7.dasharray([2,2])
                 l8.dasharray([2,2])
 
-        def draw_cell_pinyin( x, y, w, h, color='black' ):
-            # TODO: set line color
+        def draw_cell_pinyin( x, y, w, h, color='grey' ):
+            # append group of lines
+            lines = dwg.add(dwg.g(stroke=color))
             x0, x1, y0, y1, y2, y3 = x, x+w, y, y+h/3, y+h*2/3, y+h
             # top/bottom horizontal
             l1=lines.add(dwg.line(start=(x0*unit, y0*unit), end=(x1*unit, y0*unit)))
@@ -298,7 +305,8 @@ def conv(cfg):
                     c = get_new_char()
                     color = 'black'
                 #print c
-                lcolor = 'green'  # not used now
+                #lcolor = 'green'
+                lcolor = 'grey'
                 if use_pinyin:
                     draw_cell_pinyin( cursor_x, cursor_y, width, height_pinyin, lcolor )
                     draw_cell( cursor_x, cursor_y+height_pinyin, width, height, grid_type, lcolor )

@@ -16,8 +16,12 @@
 ----
 
 主界面
-![](snapshots/demo.png)
 
+* ![](snapshots/demo.png)
+
+生成
+* ![](snapshots/print1.png)
+* ![](snapshots/print2.png)
 
 
 URL: <https://github.com/pengshulin/copybook_generator>

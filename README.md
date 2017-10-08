@@ -12,6 +12,14 @@
 * wxPython生成界面
 
 
+截图
+----
+
+主界面
+![](snapshots/demo.png)
+
+
+
 URL: <https://github.com/pengshulin/copybook_generator>
 
 Peng Shulin <trees_peng@163.com> 2017
